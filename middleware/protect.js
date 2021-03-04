@@ -18,6 +18,9 @@
 const UUID = require('./../uuid');
 
 function forceLogin (keycloak, request, response) {
+
+  console.log('[keycloak-nodejs-connect] Protect.forceLogin() called');
+
   let host = request.hostname;
   let headerHost = request.headers.host.split(':');
   let port = headerHost[1] || '';
@@ -27,11 +30,16 @@ function forceLogin (keycloak, request, response) {
   let redirectUrl = protocol + '://' + host + (port === '' ? '' : ':' + port) + (request.originalUrl || request.url) + (hasQuery ? '&' : '?') + 'auth_callback=1';
 
   if (request.session) {
+    console.log('[keycloak-nodejs-connect] Protect.forceLogin() has request.session');
     request.session.auth_redirect_uri = redirectUrl;
+  }
+  else {
+    console.log('[keycloak-nodejs-connect] Protect.forceLogin() does NOT have request.session');
   }
 
   let uuid = UUID();
   let loginURL = keycloak.loginUrl(uuid, redirectUrl);
+  console.log(`[keycloak-nodejs-connect] Protect.forceLogin() redirecting to ${loginURL}`);
   response.redirect(loginURL);
 }
 
@@ -50,29 +58,28 @@ module.exports = function (keycloak, spec) {
 
   return function protect (request, response, next) {
 
-    console.log('keycloak-nodejs-connect: protect() called');
+    console.log('[keycloak-nodejs-connect] Protect.protect() called');
 
     if (request.kauth && request.kauth.grant) {
 
-      console.log('  keycloak-nodejs-connect: request.kauth.grant available');
+      console.log('  [keycloak-nodejs-connect] request.kauth.grant available');
 
       if (!guard || guard(request.kauth.grant.access_token, request, response)) {
 
-        console.log('  keycloak-nodejs-connect: guard missing or successful, calling next()');
+        console.log('  [keycloak-nodejs-connect] guard missing or successful, calling next()');
         return next();
       }
 
-      console.log('  keycloak-nodejs-connect: access denied');
+      console.log('  [keycloak-nodejs-connect] access denied');
       return keycloak.accessDenied(request, response, next);
     }
 
-    console.log('  keycloak-nodejs-connect: attempting to redirect to login');
+    console.log('  [keycloak-nodejs-connect] attempting to redirect to login');
 
     if (keycloak.redirectToLogin(request)) {
-      console.log('  keycloak-nodejs-connect: forcing login');
       forceLogin(keycloak, request, response);
     } else {
-      console.log('  keycloak-nodejs-connect: unable to redirect to login, access denied');
+      console.log('  [keycloak-nodejs-connect] unable to redirect to login, access denied');
       return keycloak.accessDenied(request, response, next);
     }
   };
