@@ -1,3 +1,5 @@
+This branch (gc3) is off of the 10.0.1 tag for use by CRA as part of debugging a GC3 issue. It includes additional output statements in `middleware/protect.js` and/or `middleware/auth-utils/grant-manager.js`.
+
 # Keycloak Node.js Adapter
 
 [![Build Status](https://travis-ci.org/keycloak/keycloak-nodejs-connect.svg?branch=master)](https://travis-ci.org/keycloak/keycloak-nodejs-connect)
@@ -7,7 +9,7 @@
 Keycloak is an Open Source Identity and Access Management solution for modern Applications and Services.
 
 This repository contains the source code for the Keycloak Node.js adapter. This module makes it simple to implement a Node.js Connect-friendly
-application that uses Keycloak for its authentication and authorization needs. 
+application that uses Keycloak for its authentication and authorization needs.
 
 ## Help and Documentation
 

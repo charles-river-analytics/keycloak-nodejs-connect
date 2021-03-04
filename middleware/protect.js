@@ -49,17 +49,30 @@ module.exports = function (keycloak, spec) {
   }
 
   return function protect (request, response, next) {
+
+    console.log('keycloak-nodejs-connect: protect() called');
+
     if (request.kauth && request.kauth.grant) {
+
+      console.log('  keycloak-nodejs-connect: request.kauth.grant available');
+
       if (!guard || guard(request.kauth.grant.access_token, request, response)) {
+
+        console.log('  keycloak-nodejs-connect: guard missing or successful, calling next()');
         return next();
       }
 
+      console.log('  keycloak-nodejs-connect: access denied');
       return keycloak.accessDenied(request, response, next);
     }
 
+    console.log('  keycloak-nodejs-connect: attempting to redirect to login');
+
     if (keycloak.redirectToLogin(request)) {
+      console.log('  keycloak-nodejs-connect: forcing login');
       forceLogin(keycloak, request, response);
     } else {
+      console.log('  keycloak-nodejs-connect: unable to redirect to login, access denied');
       return keycloak.accessDenied(request, response, next);
     }
   };

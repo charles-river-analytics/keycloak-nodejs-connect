@@ -281,6 +281,9 @@ GrantManager.prototype.validateAccessToken = function validateAccessToken (token
 };
 
 GrantManager.prototype.userInfo = function userInfo (token, callback) {
+
+  console.log('keycloak-nodejs-connect: GrantManager.userInfo() called');
+
   const url = this.realmUrl + '/protocol/openid-connect/userinfo';
   const options = URL.parse(url);
   options.method = 'GET';
@@ -297,6 +300,7 @@ GrantManager.prototype.userInfo = function userInfo (token, callback) {
   const promise = new Promise((resolve, reject) => {
     const req = getProtocol(options).request(options, (response) => {
       if (response.statusCode < 200 || response.statusCode >= 300) {
+        console.log(`response failed: ${JSON.stringify(response)}`);
         return reject(new Error('Error fetching account'));
       }
       let json = '';
